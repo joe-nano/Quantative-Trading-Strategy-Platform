@@ -4,6 +4,7 @@ import pandas as pd
 from utils.data.stock_price_data import get_stock_data
 from utils.data.column_headings import CLOSE, RETURNS
 from utils.data.sample_rates import WEEK, MONTH
+from utils.finance.constants import *
 
 
 def calculate_volume_weighed_average_price(closing_prices: list, volumes: list) -> int:
@@ -64,6 +65,55 @@ def calculate_returns_monthly(code: str) -> pd.DataFrame:
 
 
 def calculate_cumulative_returns(code: str) -> pd.DataFrame:
+    """
+
+    :param code: code of the company
+    :type code: str
+    :return: cumulative returns
+    :rtype: pd.Dataframe
+    """
     data = get_stock_data(code)
     data[RETURNS] = calculate_percentage_change(data)
     return (data[RETURNS] + 1).cumprod()
+
+
+def calculate_volatility(code: str, rolling_window: int) -> pd.DataFrame:
+    """
+
+    :param code: code of the company
+    :type code: str
+    :param rolling_window: period of the window
+    :type rolling_window: int
+    :return: volatility
+    :rtype: pd.Dataframe
+    """
+    data = get_stock_data(code)
+    return calculate_percentage_change(data).rolling(rolling_window).std()
+
+
+def calculate_annualised_volatility_for_daily_data(code: str, rolling_window: int) -> pd.DataFrame:
+    """
+    Annualised volatility for daily data
+
+    :param code: code of the company
+    :type code: str
+    :param rolling_window: period of the window
+    :type rolling_window: int
+    :return: volatility
+    :rtype: pd.Dataframe
+    """
+    return calculate_volatility(code, rolling_window)*np.sqrt(TRADING_DAYS_IN_A_YEAR)
+
+
+def calculate_annualised_volatility_for_hourly_data(code: str, rolling_window: int) -> pd.DataFrame:
+    """
+    Annualised volatility for hourly data
+
+    :param code: code of the company
+    :type code: str
+    :param rolling_window: period of the window
+    :type rolling_window: int
+    :return: volatility
+    :rtype: pd.Dataframe
+    """
+    return calculate_volatility(code, rolling_window).np.sqrt(NUMBER_OF_TRADING_HOURS_A_DAY * TRADING_DAYS_IN_A_YEAR)
