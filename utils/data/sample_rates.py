@@ -1,0 +1,2 @@
+WEEK = 'W'
+MONTH = 'M'

@@ -1,7 +1,8 @@
 import pandas_datareader
+import pandas as pd
 
 
-def get_stock_data(code):
+def get_stock_data(code: str) -> pd.DataFrame:
     try:
         return pandas_datareader.get_data_yahoo(code)
     except Exception as e:
