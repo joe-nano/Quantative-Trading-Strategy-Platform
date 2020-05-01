@@ -1,8 +1,9 @@
+import typing
 import numpy as np
 import pandas as pd
 
-from utils.data.stock_price_data import get_stock_data
-from utils.data.column_headings import CLOSE, RETURNS
+from utils.data.stock_price_data import get_stock_data, get_stocks_data
+from utils.data.column_headings import CLOSE, RETURNS, ADJUSTED_CLOSING_PRICE
 from utils.data.sample_rates import WEEK, MONTH
 from utils.finance.constants import *
 
@@ -22,6 +23,14 @@ def calculate_volume_weighed_average_price(closing_prices: list, volumes: list) 
 
 
 def calculate_percentage_change(data: pd.DataFrame) -> pd.DataFrame:
+    """
+    Calculate percentage change base on closing price
+
+    :param data: stock data
+    :type data: pd.Dataframe
+    :return: percentage change
+    :rtype: pd.Dataframe
+    """
     return data[CLOSE].pct_change()
 
 
@@ -117,3 +126,39 @@ def calculate_annualised_volatility_for_hourly_data(code: str, rolling_window: i
     :rtype: pd.Dataframe
     """
     return calculate_volatility(code, rolling_window).np.sqrt(NUMBER_OF_TRADING_HOURS_A_DAY * TRADING_DAYS_IN_A_YEAR)
+
+
+def calculate_percentage_change_based_on_adjusted_closing_price(code: str) -> pd.DataFrame:
+    """
+    Calculate percentage change of a company given a company code
+
+    :param code: company code
+    :type code: str
+    :return: percentage changes
+    :rtype: pd.Dataframe
+    """
+    return get_stock_data(code)[ADJUSTED_CLOSING_PRICE].pct_change()
+
+
+def calculate_percentage_changes_based_on_adjusted_closing_price(codes: typing.List[str]) -> pd.DataFrame:
+    """
+    Calculate percentage change of a company given a company code
+
+    :param codes: company codes
+    :type codes: list[str]
+    :return: percentage changes
+    :rtype: pd.Dataframe
+    """
+    return get_stocks_data(codes)[ADJUSTED_CLOSING_PRICE].pct_change()
+
+
+def calculate_correlation(codes: typing.List[str]):
+    """
+    Calculate the correlation between the given companies
+
+    :param codes: list of company codes
+    :type codes: List[str]
+    :return: correlation matrix
+    :rtype: pd.Dataframe
+    """
+    return calculate_percentage_changes_based_on_adjusted_closing_price(codes).dropna().corr()
