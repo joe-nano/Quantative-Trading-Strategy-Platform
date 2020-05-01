@@ -152,7 +152,7 @@ def calculate_percentage_changes_based_on_adjusted_closing_price(codes: typing.L
     return get_stocks_data(codes)[ADJUSTED_CLOSING_PRICE].pct_change()
 
 
-def calculate_correlation(codes: typing.List[str]):
+def calculate_correlation(codes: typing.List[str]) -> pd.DataFrame:
     """
     Calculate the correlation between the given companies
 
@@ -162,3 +162,63 @@ def calculate_correlation(codes: typing.List[str]):
     :rtype: pd.Dataframe
     """
     return calculate_percentage_changes_based_on_adjusted_closing_price(codes).dropna().corr()
+
+
+def calculate_correlation_over_time(codes: typing.List[str], time_period: int) -> pd.DataFrame:
+    """
+    Calculate the correlation between the given companies using a rolling period
+
+    :param codes: list of company codes
+    :type codes: list[str]
+    :param time_period: number of days
+    :type time_period: int
+    :return: correlation matrix
+    :rtype: pd.Dataframe
+    """
+    return calculate_percentage_changes_based_on_adjusted_closing_price(codes).rolling(time_period).corr()
+
+
+def calculate_correlation_over_a_year(codes: typing.List[str]) -> pd.DataFrame:
+    """
+    Calculate the correlation between the given companies using a rolling period of one year
+
+    :param codes: list of company codes
+    :type codes: list[str]
+    :return: correlation matrix
+    :rtype: pd.Dataframe
+    """
+    return calculate_correlation_over_time(codes, TRADING_DAYS_IN_A_YEAR)
+
+
+def calculate_correlation_over_time_period_between_two_companies(code1: str,
+                                                                 code2: str,
+                                                                 time_period: int) -> pd.DataFrame:
+    """
+    Calculate the correlation between the given companies using a rolling period
+
+    :param code1: company code
+    :type code1: str
+    :param code2: company code
+    :type code2: str
+    :param time_period: time period in days
+    :type time_period: int
+    :return: correlation matrix
+    :rtype: pd.Dataframe
+    """
+    return calculate_percentage_change_based_on_adjusted_closing_price(code1) \
+        .rolling(time_period) \
+        .corr(calculate_percentage_change_based_on_adjusted_closing_price(code2))
+
+
+def calculate_correlation_over_a_year_between_two_companies(code1: str, code2: str):
+    """
+    Calculate the correlation between the given companies using a rolling period of one year
+
+    :param code1: company code
+    :type code1: str
+    :param code2: company code
+    :type code2: str
+    :return: correlation matrix
+    :rtype: pd.Dataframe
+    """
+    return calculate_correlation_over_time_period_between_two_companies(code1, code2, TRADING_DAYS_IN_A_YEAR)
