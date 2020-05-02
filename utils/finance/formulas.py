@@ -175,7 +175,7 @@ def calculate_correlation_over_time(codes: typing.List[str], time_period: int) -
     :return: correlation matrix
     :rtype: pd.Dataframe
     """
-    return calculate_percentage_changes_based_on_adjusted_closing_price(codes).rolling(time_period).corr()
+    return calculate_percentage_changes_based_on_adjusted_closing_price(codes).rolling(time_period).dropna().corr()
 
 
 def calculate_correlation_over_a_year(codes: typing.List[str]) -> pd.DataFrame:
@@ -206,7 +206,8 @@ def calculate_correlation_over_time_period_between_two_companies(code1: str,
     :rtype: pd.Dataframe
     """
     return calculate_percentage_change_based_on_adjusted_closing_price(code1) \
-        .rolling(time_period) \
+        .rolling(time_period)\
+        .dropna()\
         .corr(calculate_percentage_change_based_on_adjusted_closing_price(code2))
 
 

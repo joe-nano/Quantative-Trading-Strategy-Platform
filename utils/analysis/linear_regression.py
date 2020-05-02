@@ -4,7 +4,6 @@ from sklearn.linear_model import LinearRegression
 from utils.finance import formulas
 
 
-
 class FinanceLinearRegressionModel:
     def __init__(self):
         self.lm = LinearRegression()
