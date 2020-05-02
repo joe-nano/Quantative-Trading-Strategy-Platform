@@ -26,7 +26,7 @@ def calculate_percentage_change(data: pd.DataFrame) -> pd.DataFrame:
     """
     Calculate percentage change base on closing price
 
-    :param data: stock data
+    :param data: stock closing_prices
     :type data: pd.Dataframe
     :return: percentage change
     :rtype: pd.Dataframe
@@ -102,7 +102,7 @@ def calculate_volatility(code: str, rolling_window: int) -> pd.DataFrame:
 
 def calculate_annualised_volatility_for_daily_data(code: str, rolling_window: int) -> pd.DataFrame:
     """
-    Annualised volatility for daily data
+    Annualised volatility for daily closing_prices
 
     :param code: code of the company
     :type code: str
@@ -116,7 +116,7 @@ def calculate_annualised_volatility_for_daily_data(code: str, rolling_window: in
 
 def calculate_annualised_volatility_for_hourly_data(code: str, rolling_window: int) -> pd.DataFrame:
     """
-    Annualised volatility for hourly data
+    Annualised volatility for hourly closing_prices
 
     :param code: code of the company
     :type code: str
