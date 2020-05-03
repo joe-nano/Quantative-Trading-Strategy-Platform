@@ -34,8 +34,9 @@ class PairsTrading:
         self.closing_prices_2 = self.closing_prices[self.company2]
 
         self.threshold_multiplier = 0.5  # acceptance value for trading signal
+        self.linear_regression_properties = None
 
-    def create_train_test_split(self, data: pd.Dataframe, split_index: int=None) -> (np.array, np.array):
+    def create_train_test_split(self, data: pd.DataFrame, split_index: int=None) -> (np.array, np.array):
         return data[:-self.train_test_split_index], data[-self.train_test_split_index:] if split_index is None else \
             data[:-split_index], data[-split_index:]
 
@@ -48,7 +49,8 @@ class PairsTrading:
 
         xx = np.linspace(min(x), max(x), 200)
         yy = a + beta * xx
-        return LinearRegressionPlotProperties(xx=xx, yy=yy, a=a, beta=beta)
+        self.linear_regression_properties = LinearRegressionPlotProperties(xx=xx, yy=yy, a=a, beta=beta)
+        return self.linear_regression_properties
 
     def calculate_spread(self) -> np.array:
         """
@@ -57,8 +59,10 @@ class PairsTrading:
         :return: spread values
         :rtype: np.array
         """
-        result = self.perform_linear_regression()
-        return self.closing_prices_2 - result.get_hedge_ratio() * self.closing_prices_1 - result.a
+        if not self.linear_regression_properties:
+            self.linear_regression_properties = self.perform_linear_regression()
+        return self.closing_prices_2 - self.linear_regression_properties.get_hedge_ratio()\
+               * self.closing_prices_1 - self.linear_regression_properties.a
 
     def generate_threshold(self) -> float:
         """
@@ -68,3 +72,12 @@ class PairsTrading:
         :rtype: float
         """
         return np.std(self.calculate_spread()) * self.threshold_multiplier
+
+    def get_portfolio_size(self) -> float:
+        """
+        Calculate portfolio size
+
+        :return: portfolio size
+        :rtype: float
+        """
+        return self.closing_prices_2[0] + self.linear_regression_properties.get_hedge_ratio() * self.closing_prices_1[0]

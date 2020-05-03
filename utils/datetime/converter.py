@@ -7,7 +7,7 @@ from utils.datetime.timezones import UTC
 from delorean import Delorean
 
 
-def get_current_time_in_utc():
+def get_current_time_in_utc() -> datetime:
     return datetime.now(pytz.timezone(UTC))
 
 

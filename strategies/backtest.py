@@ -79,3 +79,6 @@ class Backtest:
 
     def get_cumulative_profit_per_trade(self) -> np.array:
         return np.cumsum(self.get_profit_per_trade())
+
+    def calculate_portfolio_size(self):
+        return self.get_daily_pnl()/self.pairs_trader.get_portfolio_size()
