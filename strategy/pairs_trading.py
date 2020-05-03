@@ -1,7 +1,9 @@
 import numpy as np
 import pandas as pd
 
+from dataytpes.linear_regression_plot_properties import LinearRegressionPlotProperties
 from utils.data import stock_price_data
+from utils.analysis.linear_regression import FinanceLinearRegressionModel
 
 
 class PairsTrading:
@@ -23,6 +25,8 @@ class PairsTrading:
 
         self.train_test_split_index = -500
 
+        self.lm = FinanceLinearRegressionModel()
+
         self.closing_prices = stock_price_data.get_stocks_data_for_period(
             [self.company1, self.company2], start, end)
 
@@ -33,3 +37,13 @@ class PairsTrading:
         return data[:-self.train_test_split_index], data[-self.train_test_split_index:] if split_index is None else \
             data[:-split_index], data[-split_index:]
 
+    def perform_linear_regression(self):
+        x = self.create_train_test_split(self.closing_prices_1)
+        y = self.create_train_test_split(self.closing_prices_2)
+        self.lm = self.lm.fit(x, y)
+        a = self.lm.get_intercept()
+        beta = self.lm.get_coefficient()
+
+        xx = np.linspace(min(x), max(x), 200)
+        yy = a + beta * xx
+        return LinearRegressionPlotProperties(xx=xx, yy=yy, a=a, beta=beta)
