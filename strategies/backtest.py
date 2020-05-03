@@ -32,7 +32,7 @@ class Backtest:
         self.entry_price, self.open_time = None, None
 
     # TODO: PnL analysis
-    def perform_backtest(self):
+    def perform_backtest(self) -> None:
         for date in self.spread.index:
 
             if self.spread[date] > self.threshold and not self.inpos:
@@ -67,15 +67,15 @@ class Backtest:
 
             self.pos.append(self.inpos)
 
-    def get_profit_per_trade(self):
+    def get_profit_per_trade(self) -> pd.Series:
         return pd.Series(self.pnl)
 
-    def get_daily_pnl(self):
+    def get_daily_pnl(self) -> np.array:
         pos1 = [0] + self.pos
         return self.spread.diff() * pos1[:-1]
 
-    def get_cumulative_pnl(self):
+    def get_cumulative_pnl(self) -> np.array:
         return np.cumsum(self.get_daily_pnl())
 
-    def get_cumulative_profit_per_trade(self):
+    def get_cumulative_profit_per_trade(self) -> np.array:
         return np.cumsum(self.get_profit_per_trade())
