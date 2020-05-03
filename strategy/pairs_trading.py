@@ -33,6 +33,8 @@ class PairsTrading:
         self.closing_prices_1 = self.closing_prices[self.company1]
         self.closing_prices_2 = self.closing_prices[self.company2]
 
+        self.threshold_multiplier = 0.5  # acceptance value for trading signal
+
     def create_train_test_split(self, data: pd.Dataframe, split_index: int=None) -> (np.array, np.array):
         return data[:-self.train_test_split_index], data[-self.train_test_split_index:] if split_index is None else \
             data[:-split_index], data[-split_index:]
@@ -47,3 +49,22 @@ class PairsTrading:
         xx = np.linspace(min(x), max(x), 200)
         yy = a + beta * xx
         return LinearRegressionPlotProperties(xx=xx, yy=yy, a=a, beta=beta)
+
+    def calculate_spread(self) -> np.array:
+        """
+        Calculate spread between the two companies
+
+        :return: spread values
+        :rtype: np.array
+        """
+        result = self.perform_linear_regression()
+        return self.closing_prices_2 - result.get_hedge_ratio() * self.closing_prices_1 - result.a
+
+    def generate_threshold(self) -> float:
+        """
+        Generate threshold value for a trading signal
+
+        :return: threshold value
+        :rtype: float
+        """
+        return np.std(self.calculate_spread()) * self.threshold_multiplier
