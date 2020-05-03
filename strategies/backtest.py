@@ -7,7 +7,7 @@ When our spread falls to more than one standard deviation below the mean, we do 
 import numpy as np
 import pandas as pd
 
-from strategy.pairs_trading import PairsTrading
+from strategies.pairs_trading import PairsTrading
 
 
 class Backtest:
