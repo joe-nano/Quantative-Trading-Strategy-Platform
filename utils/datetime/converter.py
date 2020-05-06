@@ -11,6 +11,10 @@ def get_current_time_in_utc() -> datetime:
     return datetime.now(pytz.timezone(UTC))
 
 
+def get_current_time_in_local_time_zone() -> datetime:
+    return datetime.now()
+
+
 def convert_simple_datetime_string_to_datetime():
     pass
 

@@ -6,8 +6,8 @@ from utils.data import stock_price_data
 from utils.analysis.linear_regression import FinanceLinearRegressionModel
 
 
-class PairsTrading:
-    def __int__(self, company1: str, company2: str, start: str, end: str):
+class PairsTrading(object):
+    def __init__(self, company1: str, company2: str, start: str, end: str):
         """
         Constructor for Pairs trading
 
@@ -27,7 +27,7 @@ class PairsTrading:
 
         self.lm = FinanceLinearRegressionModel()
 
-        self.closing_prices = stock_price_data.get_stocks_data_for_period(
+        self.closing_prices = stock_price_data.get_stocks_data_adjusted_closing_price_for_period(
             [self.company1, self.company2], start, end)
 
         self.closing_prices_1 = self.closing_prices[self.company1]
@@ -81,3 +81,21 @@ class PairsTrading:
         :rtype: float
         """
         return self.closing_prices_2[0] + self.linear_regression_properties.get_hedge_ratio() * self.closing_prices_1[0]
+
+    def generate_trading_signal_plot(self) -> None:
+        """
+        Generate a trading signal plot based on the given data for visualisation purposes
+        """
+        import matplotlib.pyplot as plt
+        training_data_spread = self.calculate_spread()[:-self.train_test_split_index]
+        testing_data_spread = self.calculate_spread()[-self.train_test_split_index:]
+        threshold_value = self.generate_threshold()
+
+        plt.plot(training_data_spread)
+        plt.plot(testing_data_spread, color='g')
+        plt.legend(['training data', 'test data'])
+        plt.axhline(y=threshold_value, color='r')
+        plt.axhline(y=-threshold_value, color='r')
+        plt.ylabel('Spread')
+        plt.grid()
+        plt.show()

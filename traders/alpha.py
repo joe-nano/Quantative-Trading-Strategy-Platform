@@ -1,4 +1,3 @@
-from utils.data import stock_price_data
 from utils.finance import formulas
 from utils.finance.constants import TRADING_DAYS_IN_A_YEAR
 from utils.datetime import helpers as datetime_helpers
@@ -11,7 +10,7 @@ import numpy as np
 from scipy.stats import norm
 
 
-class TraderAlpha:
+class TraderAlpha(object):
     def __init__(self, companies: list):
         """
         Constructor for a trading bot
@@ -26,6 +25,8 @@ class TraderAlpha:
 
         self.benchmark_returns = None
         self.set_benchmark()
+
+        self.pair_trader = None
 
     def rank_correlations(self):
         for company in list(self.correlation_matrix):
@@ -46,17 +47,38 @@ class TraderAlpha:
         """
         self.benchmark_returns = formulas.calculate_percentage_change_based_on_adjusted_closing_price(benchmark_index)
 
-    def perform_analysis(self,
-                      comp_a: str,
-                      comp_b: str,
-                      start: str=datetime_helpers.get_current_date_some_year_ago_str(5),
-                      end: str=datetime_helpers.get_current_date_str()):
+    def perform_pair_trading(self,
+                             comp_a: str,
+                             comp_b: str,
+                             start: str=datetime_helpers.get_current_date_some_year_ago_str(5),
+                             end: str=datetime_helpers.get_current_date_str()) -> float:
+        """
+        Generate threshold value for a trade signal
 
-        pair_trader = PairsTrading(comp_a, comp_b, start, end)
-        threshhold_value = pair_trader.generate_threshold()
-        backtest = Backtest(pair_trader)
-        backtest.perform_backtest()
-        # TODO: fix
+        :param comp_a: company a index
+        :type comp_a: str
+        :param comp_b: company b index
+        :type comp_b: str
+        :param start: start date to analyse
+        :type start: str
+        :param end: end date to analyse
+        :type end: str
+        :return: threshold value
+        :rtype: float
+        """
+
+        self.pair_trader = PairsTrading(comp_a, comp_b, start, end)
+        threshold = self.pair_trader.generate_threshold()
+        return threshold
+
+    def perform_backtest(self) -> None:
+        """
+        Perform backtest
+        """
+        if self.pair_trader:
+            backtest = Backtest(self.pair_trader)
+            backtest.perform_backtest()
+
 
     @staticmethod
     def calculate_sharpe_ratio(daily_returns: np.array, time_period: int=TRADING_DAYS_IN_A_YEAR) -> float:
@@ -139,7 +161,5 @@ class TraderAlpha:
 
 if __name__ == '__main__':
     trading_bot = TraderAlpha(['CBA.AX', 'MSFT', 'TSLA', 'AMZN'])
-    trading_bot.rank_correlations()
-    trading_bot.clean_up_correlation_map()
-    print(trading_bot.correlation_matrix)
-    print(trading_bot.perform_pair_trading)
+    trading_bot.perform_pair_trading('CBA.AX', 'MSFT')
+    trading_bot.pair_trader.generate_trading_signal_plot()
