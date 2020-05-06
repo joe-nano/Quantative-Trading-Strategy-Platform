@@ -5,6 +5,10 @@ from dataytpes.linear_regression_plot_properties import LinearRegressionPlotProp
 from utils.data import stock_price_data
 from utils.analysis.linear_regression import FinanceLinearRegressionModel
 
+from configs.logger import Logger
+
+logger = Logger(__name__).log
+
 
 class PairsTrading(object):
     def __init__(self, company1: str, company2: str, start: str, end: str):
@@ -23,7 +27,7 @@ class PairsTrading(object):
         self.company1, self.company2 = company1, company2
         self.start, self.end = start, end
 
-        self.train_test_split_index = -500
+        self.train_test_split_index = 500
 
         self.lm = FinanceLinearRegressionModel()
 
@@ -37,17 +41,21 @@ class PairsTrading(object):
         self.linear_regression_properties = None
 
     def create_train_test_split(self, data: pd.DataFrame, split_index: int=None) -> (np.array, np.array):
-        return data[:-self.train_test_split_index], data[-self.train_test_split_index:] if split_index is None else \
-            data[:-split_index], data[-split_index:]
+        logger.info("Creating train test split with split index: {} and data:\n{}".format(split_index, data))
+        data.dropna(inplace=True)
+        if split_index is None:
+            return data[:-self.train_test_split_index], data[-self.train_test_split_index:]
+        else:
+            return data[:-split_index], data[-split_index:]
 
     def perform_linear_regression(self):
-        x = self.create_train_test_split(self.closing_prices_1)
-        y = self.create_train_test_split(self.closing_prices_2)
-        self.lm = self.lm.fit(x, y)
+        x_train, x_test = self.create_train_test_split(self.closing_prices_1)
+        y_train, y_test = self.create_train_test_split(self.closing_prices_2)
+        self.lm = self.lm.fit(x_train, y_train)
         a = self.lm.get_intercept()
         beta = self.lm.get_coefficient()
 
-        xx = np.linspace(min(x), max(x), 200)
+        xx = np.linspace(min(x_train), max(x_train), 200)
         yy = a + beta * xx
         self.linear_regression_properties = LinearRegressionPlotProperties(xx=xx, yy=yy, a=a, beta=beta)
         return self.linear_regression_properties
@@ -87,8 +95,8 @@ class PairsTrading(object):
         Generate a trading signal plot based on the given data for visualisation purposes
         """
         import matplotlib.pyplot as plt
-        training_data_spread = self.calculate_spread()[:-self.train_test_split_index]
-        testing_data_spread = self.calculate_spread()[-self.train_test_split_index:]
+        training_data_spread = self.calculate_spread()[:self.train_test_split_index]
+        testing_data_spread = self.calculate_spread()[self.train_test_split_index:]
         threshold_value = self.generate_threshold()
 
         plt.plot(training_data_spread)
@@ -96,6 +104,6 @@ class PairsTrading(object):
         plt.legend(['training data', 'test data'])
         plt.axhline(y=threshold_value, color='r')
         plt.axhline(y=-threshold_value, color='r')
-        plt.ylabel('Spread')
+        plt.ylabel('Spread of {} and {}'.format(self.company1, self.company2))
         plt.grid()
         plt.show()

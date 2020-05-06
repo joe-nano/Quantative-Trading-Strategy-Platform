@@ -3,6 +3,10 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 from utils.finance import formulas
 
+from configs.logger import Logger
+
+logger = Logger(__name__).log
+
 
 class FinanceLinearRegressionModel(LinearRegression):
 
@@ -18,8 +22,14 @@ class FinanceLinearRegressionModel(LinearRegression):
         :return: the linear regression model, instant of self
         :rtype: LinearRegression
         """
+        logger.info("Received these data for linear regression on x:\n{}\n\ny:{}".format(x, y))
         X = np.array([x]).T
         Y = np.array(y)
+        if len(X) != len(Y):
+            min_length = min(len(X), len(Y))
+            X = X[:min_length]
+            Y = Y[:min_length]
+        logger.info("Linear regression on X:\n{}\n\nY:{}".format(X, Y))
         return super().fit(X, Y)
 
     def fit_returns(self, x: str, y: str) -> LinearRegression:
@@ -44,7 +54,7 @@ class FinanceLinearRegressionModel(LinearRegression):
         :return: the intercept
         :rtype: float
         """
-        return super().intercept_
+        return self.intercept_
 
     def get_coefficient(self) -> np.array:
         """
@@ -53,4 +63,4 @@ class FinanceLinearRegressionModel(LinearRegression):
         :return: the coefficient of the model
         :rtype: np.array
         """
-        return super().coef_
+        return self.coef_

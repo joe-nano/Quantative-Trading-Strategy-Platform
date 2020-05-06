@@ -131,7 +131,5 @@ def get_stocks_data_adjusted_closing_price_for_period(codes: typing.List[str], s
     :return: adjusted closing price data
     :rtype: pd.Dataframe
     """
-    print(start, end)
-    print(get_stocks_data_for_period(codes, start, end))
     return get_stocks_data_for_period(codes, start, end)[ADJUSTED_CLOSING_PRICE]
 
