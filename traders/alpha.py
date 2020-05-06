@@ -3,11 +3,17 @@ from utils.finance.constants import TRADING_DAYS_IN_A_YEAR
 from utils.datetime import helpers as datetime_helpers
 from strategies.pairs_trading import PairsTrading
 from strategies.backtest import Backtest
+from strategies.key_metrics import *
 
 import collections
 import numpy as np
+import typing
 
 from scipy.stats import norm
+
+from configs.logger import Logger
+
+logger = Logger(__name__).log
 
 
 class TraderAlpha(object):
@@ -17,6 +23,7 @@ class TraderAlpha(object):
         :param companies: list of companies to trade with
         :type companies: list
         """
+        logger.info('Starting trade bot alpha to watch companies: {}'.format(companies))
         self.companies = companies
         self.correlation_matrix = formulas.calculate_correlation(companies)
         self.stocks_data = formulas.get_stocks_data(companies)
@@ -28,15 +35,38 @@ class TraderAlpha(object):
 
         self.pair_trader = None
 
-    def rank_correlations(self):
+        self.correlation_threshold = CORRELATION_THRESHOLD
+
+    def _rank_correlations(self):
         for company in list(self.correlation_matrix):
             self.correlation_map[company] = self.correlation_matrix[company]\
                 .sort_values(ascending=False).to_dict()
+        self._clean_up_correlation_map()
 
-    def clean_up_correlation_map(self):
+    def _clean_up_correlation_map(self):
         for key, item in self.correlation_map.items():
             if key in item.keys():
                 del item[key]
+
+    def compute_correlation_pairs_for_trading_strategy(self) -> typing.List[tuple]:
+        """
+        Compute which companies closely relate to each other to perform pair trading with
+        """
+        results = set()
+        self._rank_correlations()
+        self._clean_up_correlation_map()
+        logger.info('Computing correlation pairs from correlation map: {}'.format(self.correlation_map))
+        for primary_index, sorted_index_correlation_dict in self.correlation_map.items():
+            # in Python, dict.keys() always return same order if dict is not altered
+            secondary_index = list(sorted_index_correlation_dict.keys())[0]
+            if sorted_index_correlation_dict[secondary_index] <= self.correlation_threshold:
+                continue
+            index_tuple = (primary_index, secondary_index) if primary_index < secondary_index else \
+                (secondary_index, primary_index)
+            results.add(index_tuple)
+        correlation_pairs = list(results)
+        logger.info('Finished computing correlation pairs, result is: {}'.format(correlation_pairs))
+        return correlation_pairs
 
     def set_benchmark(self, benchmark_index='SPY') -> None:
         """
@@ -45,6 +75,7 @@ class TraderAlpha(object):
         :param benchmark_index: index to use
         :type benchmark_index: str
         """
+        logger.info('Set {} as benchmark to measure performance'.format(benchmark_index))
         self.benchmark_returns = formulas.calculate_percentage_change_based_on_adjusted_closing_price(benchmark_index)
 
     def perform_pair_trading(self,
@@ -161,5 +192,6 @@ class TraderAlpha(object):
 
 if __name__ == '__main__':
     trading_bot = TraderAlpha(['CBA.AX', 'MSFT', 'TSLA', 'AMZN'])
-    trading_bot.perform_pair_trading('CBA.AX', 'MSFT')
-    trading_bot.pair_trader.generate_trading_signal_plot()
+    trading_bot.compute_correlation_pairs_for_trading_strategy()
+    # trading_bot.perform_pair_trading('CBA.AX', 'MSFT')
+    # trading_bot.pair_trader.generate_trading_signal_plot()
