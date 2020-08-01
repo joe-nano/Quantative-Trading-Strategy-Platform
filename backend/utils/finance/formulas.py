@@ -22,7 +22,7 @@ def calculate_volume_weighed_average_price(closing_prices: list, volumes: list) 
     return np.sum(np.multiply(closing_prices, volumes))/np.sum(volumes)
 
 
-def calculate_percentage_change(data: pd.DataFrame) -> pd.DataFrame:
+def _calculate_percentage_change(data: pd.DataFrame) -> pd.DataFrame:
     """
     Calculate percentage change base on closing price
 
@@ -44,7 +44,7 @@ def calculate_returns_daily(code: str) -> pd.DataFrame:
     :rtype: pd.Dataframe
     """
     data = get_stock_data(code)
-    return calculate_percentage_change(data)
+    return _calculate_percentage_change(data)
 
 
 def calculate_returns_weekly(code: str) -> pd.DataFrame:
@@ -57,7 +57,7 @@ def calculate_returns_weekly(code: str) -> pd.DataFrame:
     :rtype: pd.Dataframe
     """
     data = get_stock_data(code)
-    data[CLOSE].resample(WEEK).ffill().pct_change()
+    return data[CLOSE].resample(WEEK).ffill().pct_change()
 
 
 def calculate_returns_monthly(code: str) -> pd.DataFrame:
@@ -82,7 +82,7 @@ def calculate_cumulative_returns(code: str) -> pd.DataFrame:
     :rtype: pd.Dataframe
     """
     data = get_stock_data(code)
-    data[RETURNS] = calculate_percentage_change(data)
+    data[RETURNS] = _calculate_percentage_change(data)
     return (data[RETURNS] + 1).cumprod()
 
 
@@ -97,7 +97,7 @@ def calculate_volatility(code: str, rolling_window: int) -> pd.DataFrame:
     :rtype: pd.Dataframe
     """
     data = get_stock_data(code)
-    return calculate_percentage_change(data).rolling(rolling_window).std()
+    return _calculate_percentage_change(data).rolling(rolling_window).std()
 
 
 def calculate_annualised_volatility_for_daily_data(code: str, rolling_window: int) -> pd.DataFrame:
