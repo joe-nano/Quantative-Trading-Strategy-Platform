@@ -96,8 +96,7 @@ def calculate_volatility(code: str, rolling_window: int) -> pd.DataFrame:
     :return: volatility
     :rtype: pd.Dataframe
     """
-    data = get_stock_data(code)
-    return _calculate_percentage_change(data).rolling(rolling_window).std()
+    return calculate_percentage_change_based_on_adjusted_closing_price(code).rolling(rolling_window).std()
 
 
 def calculate_annualised_volatility_for_daily_data(code: str, rolling_window: int) -> pd.DataFrame:
@@ -125,7 +124,7 @@ def calculate_annualised_volatility_for_hourly_data(code: str, rolling_window: i
     :return: volatility
     :rtype: pd.Dataframe
     """
-    return calculate_volatility(code, rolling_window).np.sqrt(NUMBER_OF_TRADING_HOURS_A_DAY * TRADING_DAYS_IN_A_YEAR)
+    return calculate_volatility(code, rolling_window) * np.sqrt(NUMBER_OF_TRADING_HOURS_A_DAY * TRADING_DAYS_IN_A_YEAR)
 
 
 def calculate_percentage_change_based_on_adjusted_closing_price(code: str) -> pd.DataFrame:
@@ -206,8 +205,8 @@ def calculate_correlation_over_time_period_between_two_companies(code1: str,
     :rtype: pd.Dataframe
     """
     return calculate_percentage_change_based_on_adjusted_closing_price(code1) \
+        .dropna() \
         .rolling(time_period)\
-        .dropna()\
         .corr(calculate_percentage_change_based_on_adjusted_closing_price(code2))
 
 

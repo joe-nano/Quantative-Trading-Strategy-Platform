@@ -39,7 +39,7 @@ class TestFormulas(unittest.TestCase):
         self.assertIsNotNone(calculate_cumulative_returns(self.company_index))
 
     def test_calculate_volatility(self):
-        self.assertIsNotNone(calculate_volatility(self.company_index))
+        self.assertIsNotNone(calculate_volatility(self.company_index, 10))
 
     def test_calculate_annualised_volatility_for_daily_data(self):
         self.assertIsNotNone(calculate_annualised_volatility_for_daily_data(self.company_index, 100))
