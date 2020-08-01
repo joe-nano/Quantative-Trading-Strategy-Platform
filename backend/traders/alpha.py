@@ -162,7 +162,7 @@ class TraderAlpha(object):
         return d
 
     @staticmethod
-    def calculate_VaR(P, c, lkbk, rets):
+    def calculate_VaR(P: float, c: float, lkbk: int, rets: np.array) -> float:
         """
         Calculate Value at Risk (VaR)
 
