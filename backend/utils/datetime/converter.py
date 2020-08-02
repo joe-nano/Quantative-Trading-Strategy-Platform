@@ -1,9 +1,8 @@
 import pytz
 
 
-from datetime import datetime, timedelta
-from dateutil.parser import parse
-from utils.datetime.timezones import UTC
+from datetime import datetime
+from utils.datetime.constants.timezones import UTC
 from delorean import Delorean
 
 

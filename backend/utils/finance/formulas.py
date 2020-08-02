@@ -4,7 +4,7 @@ import pandas as pd
 
 from utils.data.stock_price_data import get_stock_data, get_stocks_data
 from utils.data.column_headings import CLOSE, RETURNS, ADJUSTED_CLOSING_PRICE
-from utils.data.sample_rates import WEEK, MONTH
+from utils.data.constants.sample_rates import WEEK, MONTH
 from utils.finance.constants import *
 
 
@@ -136,7 +136,7 @@ def calculate_percentage_change_based_on_adjusted_closing_price(code: str) -> pd
     :return: percentage changes
     :rtype: pd.Dataframe
     """
-    return get_stock_data(code)[ADJUSTED_CLOSING_PRICE].pct_change()
+    return get_stock_data(code)[ADJUSTED_CLOSING_PRICE].pct_change().dropna()
 
 
 def calculate_percentage_changes_based_on_adjusted_closing_price(codes: typing.List[str]) -> pd.DataFrame:
@@ -148,7 +148,7 @@ def calculate_percentage_changes_based_on_adjusted_closing_price(codes: typing.L
     :return: percentage changes
     :rtype: pd.Dataframe
     """
-    return get_stocks_data(codes)[ADJUSTED_CLOSING_PRICE].pct_change()
+    return get_stocks_data(codes)[ADJUSTED_CLOSING_PRICE].pct_change().dropna()
 
 
 def calculate_correlation(codes: typing.List[str]) -> pd.DataFrame:

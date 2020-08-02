@@ -2,7 +2,10 @@ import typing
 import pandas_datareader
 import pandas as pd
 
-from utils.data.column_headings import *
+from utils.data.constants.column_headings import *
+from dataytpes.exceptions import data
+
+error_msg = 'Error retrieving closing_prices from Yahoo Finance, company code used: {}, Exception: {}'
 
 
 def get_stock_data(code: str) -> pd.DataFrame:
@@ -17,7 +20,7 @@ def get_stock_data(code: str) -> pd.DataFrame:
     try:
         return pandas_datareader.get_data_yahoo(code)
     except Exception as e:
-        print('Error retrieving closing_prices from Yahoo Finance, company code used: {}, Exception: '.format(code, e))
+        raise_retrieval_error(code, e)
 
 
 def get_stocks_data(codes: typing.List[str]) -> pd.DataFrame:
@@ -32,7 +35,7 @@ def get_stocks_data(codes: typing.List[str]) -> pd.DataFrame:
     try:
         return pandas_datareader.get_data_yahoo(codes)
     except Exception as e:
-        print('Error retrieving closing_prices from Yahoo Finance, company codes used: {}, Exception: '.format(codes, e))
+        raise_retrieval_errors(codes, e)
 
 
 def get_stock_data_for_period(code: str, start: str, end: str) -> pd.DataFrame:
@@ -51,7 +54,7 @@ def get_stock_data_for_period(code: str, start: str, end: str) -> pd.DataFrame:
     try:
         return pandas_datareader.get_data_yahoo(code, start, end)
     except Exception as e:
-        print('Error retrieving stocks data from Yahoo Finance, company code used: {}, Exception: {}'.format(code, e))
+        raise_retrieval_error(code, e)
 
 
 def get_stocks_data_for_period(codes: typing.List[str], start: str, end: str) -> pd.DataFrame:
@@ -70,8 +73,7 @@ def get_stocks_data_for_period(codes: typing.List[str], start: str, end: str) ->
     try:
         return pandas_datareader.get_data_yahoo(codes, start, end)
     except Exception as e:
-        print('Error retrieving stock data from Yahoo Finance, '
-              'company codes used: {}, Exception: {}'.format(codes, e))
+        raise_retrieval_errors(codes, e)
 
 
 def get_stock_data_adjusted_closing_price(code: str) -> pd.DataFrame:
@@ -133,3 +135,12 @@ def get_stocks_data_adjusted_closing_price_for_period(codes: typing.List[str], s
     """
     return get_stocks_data_for_period(codes, start, end)[ADJUSTED_CLOSING_PRICE]
 
+
+def raise_retrieval_error(code: str, exception: Exception, msg: str=error_msg):
+    msg = msg.format(code, exception)
+    raise data.DataRetrievalException(msg, exception)
+
+
+def raise_retrieval_errors(codes: typing.List[str], exception: Exception, msg: str=error_msg):
+    msg = msg.format(codes, exception)
+    raise data.DataRetrievalException(msg, exception)

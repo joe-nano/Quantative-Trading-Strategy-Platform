@@ -10,7 +10,7 @@ logger = Logger(__name__).log
 
 class FinanceLinearRegressionModel(LinearRegression):
 
-    def fit(self, x: np.array, y: np.array, sample_weight=None) -> LinearRegression:
+    def fit(self, x: np.array, y: np.array, sample_weight: np.array=None) -> LinearRegression:
         """
         Fit two numpy array into linear regression model
         :param x: data
@@ -30,7 +30,7 @@ class FinanceLinearRegressionModel(LinearRegression):
             X = X[:min_length]
             Y = Y[:min_length]
         logger.info("Linear regression on X:\n{}\n\nY:{}".format(X, Y))
-        return super().fit(X, Y)
+        return super().fit(X, Y, sample_weight)
 
     def fit_returns(self, x: str, y: str) -> LinearRegression:
         """
@@ -43,9 +43,9 @@ class FinanceLinearRegressionModel(LinearRegression):
         :return: the linear regression model
         :rtype: LinearRegression
         """
-        X = np.array(formulas.calculate_percentage_change_based_on_adjusted_closing_price(x)[x]).T
-        Y = np.array(formulas.calculate_percentage_change_based_on_adjusted_closing_price(y)[y])
-        return super().fit(X, Y)
+        X = np.array(formulas.calculate_percentage_changes_based_on_adjusted_closing_price([x])[x]).T
+        Y = np.array(formulas.calculate_percentage_changes_based_on_adjusted_closing_price([y])[y])
+        return super().fit(X.reshape(-1, 1), Y.reshape(-1, 1))
 
     def get_intercept(self) -> float:
         """
