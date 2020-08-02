@@ -133,3 +133,6 @@ dmypy.json
 
 # Pytest
 **/.pytest_cache
+
+# Mac OSX
+**/.DS_Store
