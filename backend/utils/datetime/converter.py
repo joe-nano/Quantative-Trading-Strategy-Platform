@@ -1,9 +1,10 @@
 import pytz
 
-
 from datetime import datetime
 from utils.datetime.constants.timezones import UTC
 from delorean import Delorean
+
+from datatypes.exceptions import timezones
 
 
 def get_current_time_in_utc() -> datetime:
@@ -44,4 +45,5 @@ def get_time_difference_to_timezone():
 
 
 def get_invalid_timezone_exception(e: Exception, timezone: str) -> None:
-    print('Invalid timezone {} used, got exception: {}'.format(timezone, e))
+    message = 'Invalid timezone {} used, got exception: {}'.format(timezone, e)
+    raise timezones.TimeZoneConversionException(message, e)

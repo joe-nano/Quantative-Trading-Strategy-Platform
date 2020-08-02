@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from dataytpes.linear_regression_plot_properties import LinearRegressionPlotProperties
+from datatypes.linear_regression_plot_properties import LinearRegressionPlotProperties
 from utils.data import stock_price_data
 from utils.analysis.linear_regression import FinanceLinearRegressionModel
 

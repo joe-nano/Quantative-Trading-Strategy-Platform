@@ -1,7 +1,7 @@
 import unittest
 import pytest
 
-from dataytpes.exceptions.data import DataRetrievalException
+from datatypes.exceptions.data import DataRetrievalException
 from utils.data.stock_price_data import *
 from utils.datetime.helpers import get_number_of_days_between_two_dates
 

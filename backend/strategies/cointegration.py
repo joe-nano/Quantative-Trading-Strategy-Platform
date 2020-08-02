@@ -3,7 +3,7 @@ Class for cointegration
 """
 import typing
 
-from dataytpes.cointegration_result import CointegrationResult
+from datatypes.cointegration_result import CointegrationResult
 from utils.data import stock_price_data
 from statsmodels.tsa.stattools import coint
 

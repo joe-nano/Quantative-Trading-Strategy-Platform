@@ -3,7 +3,7 @@ import pandas_datareader
 import pandas as pd
 
 from utils.data.constants.column_headings import *
-from dataytpes.exceptions import data
+from datatypes.exceptions import data
 
 error_msg = 'Error retrieving closing_prices from Yahoo Finance, company code used: {}, Exception: {}'
 
