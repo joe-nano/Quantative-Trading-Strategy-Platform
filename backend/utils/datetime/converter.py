@@ -26,22 +26,18 @@ def get_current_time_in_timezone(timezone: str) -> datetime:
         get_invalid_timezone_exception(e, timezone)
 
 
-def get_datetime_in_timezone(year: int, month: int, date: int, timezone: str) -> Delorean.datetime:
+def get_datetime_in_timezone(year: int, month: int, date: int, timezone: str) -> Delorean:
     try:
-        return Delorean(datetime(year, month, date), timezone=timezone).datetime
+        return Delorean(datetime(year, month, date), timezone=timezone)
     except Exception as e:
         get_invalid_timezone_exception(e, timezone)
 
 
-def get_time_difference_to_timezone_delorean(src_datetime: Delorean, timezone_to_lookup: str) -> datetime:
+def get_time_difference_to_timezone(src_timezone: pytz, target_timezone: pytz) -> int:
     try:
-        return src_datetime.datetime - src_datetime.shift(timezone_to_lookup).datetime
+        return (datetime.now().astimezone(src_timezone) - datetime.now().astimezone(target_timezone)).min // (60 * 24)
     except Exception as e:
-        get_invalid_timezone_exception(e, timezone_to_lookup)
-
-
-def get_time_difference_to_timezone():
-    pass
+        get_invalid_timezone_exception(e, src_timezone)
 
 
 def get_invalid_timezone_exception(e: Exception, timezone: str) -> None:
