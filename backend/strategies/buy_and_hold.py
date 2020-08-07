@@ -1,8 +1,10 @@
 """
 Class for buy and hold strategy
 """
+from datetime import timedelta
+
 from utils.data import stock_price_data
-from utils.data import column_headings
+from utils.data.constants import column_headings
 
 
 class BuyAndHold:
@@ -13,7 +15,7 @@ class BuyAndHold:
         :param holding_period: holding period to use
         :type holding_period: int
         """
-        self.holding_period = holding_period
+        self.holding_period = timedelta(holding_period)
 
         # This indicates whether we have a position on or not
         self.inpos = 0
