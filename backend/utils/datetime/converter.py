@@ -32,14 +32,6 @@ def get_datetime_in_timezone(year: int, month: int, date: int, timezone: str) ->
     except Exception as e:
         get_invalid_timezone_exception(e, timezone)
 
-
-def get_time_difference_to_timezone(src_timezone: pytz, target_timezone: pytz) -> int:
-    try:
-        return (datetime.now().astimezone(src_timezone) - datetime.now().astimezone(target_timezone)).min // (60 * 24)
-    except Exception as e:
-        get_invalid_timezone_exception(e, src_timezone)
-
-
 def get_invalid_timezone_exception(e: Exception, timezone: str) -> None:
     message = 'Invalid timezone {} used, got exception: {}'.format(timezone, e)
     raise timezones.TimeZoneConversionException(message, e)

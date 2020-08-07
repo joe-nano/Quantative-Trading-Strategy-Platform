@@ -26,11 +26,4 @@ class TestConverter(unittest.TestCase):
 
     def test_get_datetime_in_timezone_with_invalid_timezone_exception(self):
         with pytest.raises(TimeZoneConversionException):
-            get_datetime_in_timezone(20001, 13, 40, 'Unknown timezone')
-
-    def test_get_time_difference_to_timezone_delorean(self):
-        self.assertEqual(10, get_time_difference_to_timezone(pytz.timezone(timezones.AEST), pytz.UTC))
-
-    def test_get_time_difference_to_timezone_delorean_with_invalid_timezone_exception(self):
-        with pytest.raises(TimeZoneConversionException):
-            get_time_difference_to_timezone(timezones.UTC, 'Unknown timezone')
+            get_datetime_in_timezone(20001, 13, 40, 'Unknown timezone')(timezones.UTC, 'Unknown timezone')
