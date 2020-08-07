@@ -3,9 +3,9 @@ import numpy as np
 import pandas as pd
 
 from utils.data.stock_price_data import get_stock_data, get_stocks_data
-from utils.data.column_headings import CLOSE, RETURNS, ADJUSTED_CLOSING_PRICE
+from utils.data.constants.column_headings import CLOSE, RETURNS, ADJUSTED_CLOSING_PRICE
 from utils.data.constants.sample_rates import WEEK, MONTH
-from utils.finance.constants import *
+from utils.finance.constants.trading_days import *
 
 
 def calculate_volume_weighed_average_price(closing_prices: list, volumes: list) -> int:

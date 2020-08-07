@@ -27,8 +27,6 @@ class PairsTrading(object):
         self.company1, self.company2 = company1, company2
         self.start, self.end = start, end
 
-        self.train_test_split_index = 500
-
         self.lm = FinanceLinearRegressionModel()
 
         self.closing_prices = stock_price_data.get_stocks_data_adjusted_closing_price_for_period(
@@ -37,10 +35,12 @@ class PairsTrading(object):
         self.closing_prices_1 = self.closing_prices[self.company1]
         self.closing_prices_2 = self.closing_prices[self.company2]
 
+        self.train_test_split_index = int(((len(self.closing_prices_1) + len(self.closing_prices_2)) // 2) * 0.7)
+
         self.threshold_multiplier = 0.5  # acceptance value for trading signal
         self.linear_regression_properties = None
 
-    def create_train_test_split(self, data: pd.DataFrame, split_index: int=None) -> (np.array, np.array):
+    def _create_train_test_split(self, data: pd.DataFrame, split_index: int=None) -> (np.array, np.array):
         logger.info("Creating train test split with split index: {} and data:\n{}".format(split_index, data))
         data.dropna(inplace=True)
         if split_index is None:
@@ -49,8 +49,14 @@ class PairsTrading(object):
             return data[:-split_index], data[-split_index:]
 
     def perform_linear_regression(self):
-        x_train, x_test = self.create_train_test_split(self.closing_prices_1)
-        y_train, y_test = self.create_train_test_split(self.closing_prices_2)
+        """
+        Performs linear regression
+
+        :return: linear regression plot properties
+        :rtype: LinearRegressionPlotProperties
+        """
+        x_train, x_test = self._create_train_test_split(self.closing_prices_1)
+        y_train, y_test = self._create_train_test_split(self.closing_prices_2)
         self.lm = self.lm.fit(x_train, y_train)
         a = self.lm.get_intercept()
         beta = self.lm.get_coefficient()
@@ -88,6 +94,8 @@ class PairsTrading(object):
         :return: portfolio size
         :rtype: float
         """
+        if not self.linear_regression_properties:
+            self.linear_regression_properties = self.perform_linear_regression()
         return self.closing_prices_2[0] + self.linear_regression_properties.get_hedge_ratio() * self.closing_prices_1[0]
 
     def generate_trading_signal_plot(self) -> None:
