@@ -6,14 +6,40 @@ DATE_STRING_FORMATTER = '%Y-%m-%d'
 
 
 def get_current_date_str(formatter=DATE_STRING_FORMATTER) -> str:
+    """
+    Get current date with the format
+
+    :param formatter: format of date
+    :type formatter: str
+    :return: date
+    :rtype: str
+    """
     return get_current_time_in_local_time_zone().strftime(formatter)
 
 
 def get_current_date_one_year_ago_str(formatter=DATE_STRING_FORMATTER) -> str:
+    """
+    Get a current date from some years ago
+
+    :param formatter: format of date
+    :type formatter: str
+    :return: Date before some years
+    :rtype: str
+    """
     return (get_current_time_in_local_time_zone() - timedelta(days=NUMBER_OF_DAYS_IN_A_YEAR)).strftime(formatter)
 
 
 def get_current_date_some_year_ago_str(year: int, formatter=DATE_STRING_FORMATTER) -> str:
+    """
+    Get a current date from some years ago
+
+    :param year: number of years before
+    :type year: int
+    :param formatter: format of date
+    :type formatter: str
+    :return: Date before some years
+    :rtype: str
+    """
     return (get_current_time_in_local_time_zone() - timedelta(days=year*NUMBER_OF_DAYS_IN_A_YEAR)).strftime(formatter)
 
 
