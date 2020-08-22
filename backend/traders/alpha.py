@@ -1,9 +1,9 @@
 from utils.finance import formulas
-from utils.finance.constants import TRADING_DAYS_IN_A_YEAR
+from utils.finance.constants.trading_days import TRADING_DAYS_IN_A_YEAR
 from utils.datetime import helpers as datetime_helpers
 from strategies.pairs_trading import PairsTrading
 from strategies.backtest import Backtest
-from strategies.key_metrics import *
+from strategies.constants.key_metrics import *
 
 import collections
 import numpy as np
