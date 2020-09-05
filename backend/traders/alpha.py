@@ -79,26 +79,17 @@ class TraderAlpha(object):
         self.benchmark_returns = formulas.calculate_percentage_change_based_on_adjusted_closing_price(benchmark_index)
 
     def perform_pair_trading(self,
-                             comp_a: str,
-                             comp_b: str,
-                             start: str=datetime_helpers.get_current_date_some_year_ago_str(5),
-                             end: str=datetime_helpers.get_current_date_str()) -> float:
+                             pair_trader: PairsTrading) -> float:
         """
         Generate threshold value for a trade signal
 
-        :param comp_a: company a index
-        :type comp_a: str
-        :param comp_b: company b index
-        :type comp_b: str
-        :param start: start date to analyse
-        :type start: str
-        :param end: end date to analyse
-        :type end: str
+        :param pair_trader: Pair Trader
+        :type pair_trader: PairsTrading
         :return: threshold value
         :rtype: float
         """
 
-        self.pair_trader = PairsTrading(comp_a, comp_b, start, end)
+        self.pair_trader = pair_trader
         threshold = self.pair_trader.generate_threshold()
         return threshold
 
@@ -141,25 +132,9 @@ class TraderAlpha(object):
         :return: Shortino ratio
         :rtype: float
         """
-        return np.mean(daily_returns)/np.std(daily_returns[daily_returns<0])*np.sqrt(time_period)
-
-    @staticmethod
-    def calculate_drawdown(ret: np.array) -> float:
-        """
-        Calculate drawdown
-
-        :param ret: returns array
-        :type ret: np.array
-        :return: drawdown
-        :rtype: float
-        """
-        cum_ret = np.cumprod(ret + 1)
-        running_max = np.fmax.accumulate(cum_ret)
-        # Ensure the value never drops below 1
-        running_max[running_max < 1] = 1
-
-        d = cum_ret / running_max - 1
-        return d
+        if not len(daily_returns[daily_returns < 0]):
+            return 0
+        return np.mean(daily_returns)/np.std(daily_returns[daily_returns < 0])*np.sqrt(time_period)
 
     @staticmethod
     def calculate_VaR(P: float, c: float, lkbk: int, rets: np.array) -> float:
@@ -180,13 +155,14 @@ class TraderAlpha(object):
         :return: VaR
         :rtype: float
         """
+        if c > 1:
+            raise ValueError('Confidence interval cannot be larger than 1, confidence interval used: {}'.format(c))
         mu = np.mean(rets[-lkbk:])
         sigma = np.std(rets[-lkbk:])
         alpha = norm.ppf(1 - c, mu, sigma)
-
         result = round(P - P * (alpha + 1))
-        print('With {} confidence, we expect that our worst daily loss will not exceed ${} on our ${} portfolio.'.
-              format(c, result, P))
+        logger.info('With {} confidence, we expect that our worst daily loss will not exceed ${} on our '
+                    '${} portfolio.'.format(c, result, P))
         return result
 
 
