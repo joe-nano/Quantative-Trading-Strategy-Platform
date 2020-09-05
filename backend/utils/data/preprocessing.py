@@ -1,0 +1,51 @@
+import pandas as pd
+import datetime
+import typing
+
+from utils.data.constants.column_headings import *
+
+
+def make_data_match(stock_one_data: pd.DataFrame, stock_two_data: pd.DataFrame) ->\
+        typing.Tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Pre-Processing data and drop dates that is not in both stock data
+
+    :param stock_one_data:
+    :type stock_one_data:
+    :param stock_two_data:
+    :type stock_two_data:
+    :return:
+    :rtype:
+    """
+    # Truncate data by date
+    if stock_one_data[DATE][0] > stock_two_data[DATE][0]:
+        stock_one_data = stock_one_data[stock_one_data.Date >= stock_two_data['Date'][0]]
+        stock_one_data.reset_index(inplace=True, drop=True)
+    else:
+        stock_two_data = stock_two_data[stock_two_data.Date >= stock_one_data['Date'][0]]
+        stock_two_data.reset_index(inplace=True, drop=True)
+
+    # Remove dates not in either data
+    list1 = stock_one_data[DATE]
+    list2 = stock_two_data[DATE]
+    diff_pd1_data = list(set(list1) - set(list2))
+    diff_pd2_data = list(set(list2) - set(list1))
+    for k in range(len(diff_pd1_data)):
+        pd1_dat_format = diff_pd1_data[k].strftime('%Y-%m-%d 00:00:00')
+        date_format_pd1 = datetime.datetime.strptime(pd1_dat_format, "%Y-%m-%d 00:00:00")
+        for i, j in enumerate(list1):
+            if j == date_format_pd1:
+                stock_one_data.drop([i], inplace=True)
+
+    stock_one_data.reset_index(inplace=True, drop=True)
+
+    for k in range(len(diff_pd2_data)):
+        pd2_dat_format = diff_pd2_data[k].strftime('%Y-%m-%d 00:00:00')
+        date_format_pd2 = datetime.datetime.strptime(pd2_dat_format, "%Y-%m-%d 00:00:00")
+        for M, N in enumerate(list2):
+            if N == date_format_pd2:
+                stock_two_data.drop([M], inplace=True)
+
+    stock_two_data.reset_index(inplace=True, drop=True)
+    return stock_one_data, stock_two_data
+
