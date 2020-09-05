@@ -1,0 +1,2 @@
+RELU = 'relu'
+LINEAR = 'linear'
