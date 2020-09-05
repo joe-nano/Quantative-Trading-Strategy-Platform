@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import pytest
 
-from traders.alpha import TraderAlpha
+from traders.alpha.alpha import TraderAlpha
 
 
 class TestTraderAlpha(unittest.TestCase):
