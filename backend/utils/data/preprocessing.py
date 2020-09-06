@@ -49,3 +49,21 @@ def make_data_match(stock_one_data: pd.DataFrame, stock_two_data: pd.DataFrame) 
     stock_two_data.reset_index(inplace=True, drop=True)
     return stock_one_data, stock_two_data
 
+
+def get_train_test_split(data: pd.DataFrame, train_split: int, test_split: int) -> \
+        typing.Tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Get train test split data, default to 7:3 split if input is bad
+
+    :param data: data to split
+    :type data: pd.Dataframe
+    :param train_split: training set split index
+    :type train_split: int
+    :param test_split: testing set size
+    :type test_split: int
+    :return: training and testing data set
+    :rtype: Tuple(pd.Dataframe, pd.Dataframe)
+    """
+    if train_split + test_split > len(data):
+        return data[:int(len(data)*0.7)], data[int(len(data)*0.7):]
+    return data[:train_split], data[train_split: train_split+test_split]
